@@ -16,7 +16,38 @@ Obiettivo:
 import numpy  as np
 import pandas as pd 
 from datetime import datetime
+import sys
 
+""" 
+Sottoprogramma che legge il file CSV
+"""
+def fatal_error(message):
+    """
+    manage a fatal error: print a message and exit program
+    :param message: message to be printed
+    :return: None
+    """
+    print(message)
+    exit()
+
+
+def read_csv_file(file_name):
+    """
+    read a json file and returns data
+    manage exceptions
+    :param file_name: file to be read
+    :return: data structure corresponding to file content
+    """
+    try:
+        fin = open(file_name)
+        database_taxi = pd.read_csv(fin)
+        fin.close()
+        return database_taxi
+    except OSError as message:
+        fatal_error(message)
+""" 
+Sottoprogramma che salva il file 
+"""
 
 def reduced_database_passeger_count(database_taxi):
     """ 
@@ -77,12 +108,20 @@ dividere il dataframe nei 5 borough:
     - Brooklyn
     - The Bronx
     - Staten Island
+NB uso la posizione del passeggero quando sale sul taxi 
 Cosi da lavorae seperatamente su ognuno come richiesto 
+"""
+"""
+Un sottoprogramma che ci da in uscita un nuovo dataframe che contiene fasce orarie
+(da 0 a 23 ogni ora) e numero totale di passeggeri
+"""
+"""
+Grafico dei dati
 """
 
 #### CODICE ####
-
-database_taxi = pd.read_csv('yellow_tripdata_2020-02.csv').head(80) 
+file_name = input('inserisci un file .csv: ')
+database_taxi = read_csv_file(file_name) 
 
 # in input deve essere specificato l'anno del file
 periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
