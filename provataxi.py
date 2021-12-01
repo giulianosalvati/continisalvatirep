@@ -4,39 +4,92 @@
 Created on Wed Nov 24 10:20:53 2021
 
 @author: giuliano
+
+Obiettivo:
+    - Quali sono le fascie orarie con più passeggeri
+    - Quali sono le fascie orarie con meno passeggeri
+    ripetere tale analisi per ogni borough
+    fasce orarie considerate: ogni due ore (?) / ogni ora (?)
+    tipo di grafico:  
 """
-import datetime
+
 import numpy  as np
 import pandas as pd 
+from datetime import datetime
 
+
+def reduced_database_passeger_count(database_taxi):
+    """ 
+    Elimino tutte le colonne del dataframe che non mi interessano. 
+    Tengo in considerazione solo le colonne:
+        tpep_pickup_datetime 
+        passenger_count 
+        PULocationID 
+    
+    """
+    del database_taxi['VendorID']
+    del database_taxi['DOLocationID']
+    del database_taxi['trip_distance']
+    del database_taxi['tpep_dropoff_datetime']
+    del database_taxi['RatecodeID']
+    del database_taxi['store_and_fwd_flag']
+    del database_taxi['payment_type']
+    del database_taxi['fare_amount']
+    del database_taxi['extra']
+    del database_taxi['mta_tax']
+    del database_taxi['tip_amount']
+    del database_taxi['tolls_amount']
+    del database_taxi['improvement_surcharge']
+    del database_taxi['total_amount']
+    del database_taxi['congestion_surcharge']
+    return database_taxi
+
+
+def check_month_database(database_taxi,periodo):
+    """
+    sottoprogramma che in base all'anno e al mese che vengono inseriti in input
+    (quelli del file) elimina eventuali dati che non sono di tale periodo.
+    ATTENZIONE! tengo conto della data in cui il passeggero è salito nel taxi
+    """
+    # d = datetime.strptime(database_taxi['tpep_pickup_datetime'],'%Y-%m-%d %H:%M:%S')
+    # database_taxi['tpep_pickup_datetime'] = d
+    # temp_database = pd.DataFrame(columns=(database_taxi.columns))
+    # for data in database_taxi:
+    #     if data['tpep_pickup_datetime'].year != periodo.year || data['tpep_pickup_datetime'].month != periodo.month:
+    #         temp_database = temp_database
+    #         else:
+    #             temp_database =  temp_database.append(data)  
+    # database_taxi = temp_database                              
+    return database_taxi
+   
+
+def zero_passenger(database_taxi):
+    """
+    sottoprogramma che elimina eventuali dati con 0 passeggeri
+    """
+    database_taxi = database_taxi[database_taxi['passenger_count'] > 0]
+    return database_taxi
+            
 """
-Quali sono le fasce orarie con più passeggeri? E quella con meno? 
-Impostate le vostre fasce orarie (per esempio ogni ora) e scoprite quali sono quelle in cui i taxi 
-guidano il maggior numero di passeggeri e ripetete l'analisi per ogni borough. 
-Fornite i risultati attraverso un file e un plot. 
-Input: anno, mese*, borough*
-Output: file, grafico
+dividere il dataframe nei 5 borough:
+    - Manhattan
+    - Queens
+    - Brooklyn
+    - The Bronx
+    - Staten Island
+Cosi da lavorae seperatamente su ognuno come richiesto 
 """
 
-# def ReadJsonFile(file):
-#     try:
-#         database = pd.csv_json(file)
-#         return log_list
-#     except:
-#         print('Could not load the file! \nThe specified file path-name does not exist!')
-#         sys.exit()
+#### CODICE ####
 
-database_taxi_ridotto = pd.read_csv('/Users/giuliano/Desktop/yellow_tripdata_2020-01.csv').head(80)
+database_taxi = pd.read_csv('yellow_tripdata_2020-02.csv').head(80) 
 
-#ordino, in base alla data di partenza,  prendendo in considerazione la data di partenza e il numero di passeggeri a carico
-interessed_df= database_taxi_ridotto[[ 'tpep_pickup_datetime','passenger_count']].sort_values(by=['tpep_pickup_datetime'])
+# in input deve essere specificato l'anno del file
+periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
+periodo = datetime.strptime(periodo,'%Y-%m')
 
-#converto la colonna della data di ingresso in formato datetime più utile
-interessed_df['tpep_pickup_datetime']=pd.to_datetime(interessed_df['tpep_pickup_datetime'])
+database_taxi = reduced_database_passeger_count(database_taxi)
+database_taxi = check_month_database(database_taxi, periodo)
+database_taxi = zero_passenger(database_taxi)
 
-#come eliminare  date che non sono di mio interesse
-#creo una data di soglia(un minuto prima dell'anno che sto considerando) e ripulisco il dataset
-limit_day= pd.to_datetime('2019-12-31 23:59:59')
-interessed_df=interessed_df.drop(interessed_df[interessed_df.tpep_pickup_datetime < limit_day].index
-
-#resta da confrontare il dataframe con le fasce orarie di interesse e calcolare quelle con più/meno passeggeri
+print('Fine')
