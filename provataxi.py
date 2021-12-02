@@ -101,16 +101,44 @@ def zero_passenger(database_taxi):
     database_taxi = database_taxi[database_taxi['passenger_count'] > 0]
     return database_taxi
             
-"""
-dividere il dataframe nei 5 borough:
-    - Manhattan
-    - Queens
-    - Brooklyn
-    - The Bronx
-    - Staten Island
-NB uso la posizione del passeggero quando sale sul taxi 
-Cosi da lavorae seperatamente su ognuno come richiesto 
-"""
+
+def separate_borough(database_taxi,df_zone,borough_name):
+    """
+    Sottoprogramma che dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
+    borough e il nome del borough,
+    restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
+    hanno come 'PULocationID' un codice che appartiene al borough in ingresso
+    """
+   
+    # borough : DataFrame vuoto che sarà riempito degli eventuali dati che 
+    # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
+   
+    borough = pd.DataFrame(columns=(database_taxi.columns))
+    
+    # loc_borough : Lista vuota che sarà riempita di tutti i codici che 
+    # corrispondono al borough considerato
+    
+    loc_borough = []
+    
+    # scorro le righe del dataframe delle zone in modo da riempire la lista 
+    # loc_borough definita precedentemente
+    
+    for i,zona in df_zone.iterrows():
+        # se il codice di una zona corrisponde al borough considerato
+        if zona[1] == borough_name:
+            # aggiungo il codice a loc_borough
+            loc_borough = loc_borough + [zona[0]]
+            
+    # scorro le righe del dataframe dei dati in modo da riempire il dataframe 
+    # borough 
+   
+    for i,data in database_taxi.iterrows():
+        # se il dato ha come 'PULocationID' un codice in loc_borough
+        if data['PULocationID'] in loc_borough:
+            # aggiungo il dato a borough
+           borough = borough.append(data)
+    
+    return borough             
 """
 Un sottoprogramma che ci da in uscita un nuovo dataframe che contiene fasce orarie
 (da 0 a 23 ogni ora) e numero totale di passeggeri
@@ -121,14 +149,21 @@ Grafico dei dati
 
 #### CODICE ####
 file_name = input('inserisci un file .csv: ')
-database_taxi = read_csv_file(file_name) 
-
+database_taxi = read_csv_file(file_name).head(80)
+#df_zone è un dataframe che contine i codici identificativi dei 5 borough
+df_zone = pd.read_csv('taxi+_zone_lookup.csv')
+df_zone['Borough'] = df_zone['Borough'].astype("string")
 # in input deve essere specificato l'anno del file
 periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
 periodo = datetime.strptime(periodo,'%Y-%m')
-
 database_taxi = reduced_database_passeger_count(database_taxi)
 database_taxi = check_month_database(database_taxi, periodo)
 database_taxi = zero_passenger(database_taxi)
+
+borough_Manhattan = separate_borough(database_taxi, df_zone,'Manhattan')
+borough_Queens = separate_borough(database_taxi, df_zone,'Queens')
+borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
+borough_Staten_Island = separate_borough(database_taxi, df_zone,'Staten Island')
+borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
 
 print('Fine')
