@@ -17,6 +17,7 @@ import numpy  as np
 import pandas as pd 
 from datetime import datetime
 import sys
+from tqdm import tqdm
 
 """ 
 Sottoprogramma che legge il file CSV
@@ -112,7 +113,6 @@ def separate_borough(database_taxi,df_zone,borough_name):
    
     # borough : DataFrame vuoto che sarà riempito degli eventuali dati che 
     # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
-   
     borough = pd.DataFrame(columns=(database_taxi.columns))
     
     # loc_borough : Lista vuota che sarà riempita di tutti i codici che 
@@ -128,15 +128,8 @@ def separate_borough(database_taxi,df_zone,borough_name):
         if zona[1] == borough_name:
             # aggiungo il codice a loc_borough
             loc_borough = loc_borough + [zona[0]]
-            
-    # scorro le righe del dataframe dei dati in modo da riempire il dataframe 
-    # borough 
-   
-    for i,data in database_taxi.iterrows():
-        # se il dato ha come 'PULocationID' un codice in loc_borough
-        if data['PULocationID'] in loc_borough:
-            # aggiungo il dato a borough
-           borough = borough.append(data)
+
+    borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]
     
     return borough             
 """
@@ -149,10 +142,9 @@ Grafico dei dati
 
 #### CODICE ####
 file_name = input('inserisci un file .csv: ')
-database_taxi = read_csv_file(file_name).head(80)
+database_taxi = read_csv_file(file_name)
 #df_zone è un dataframe che contine i codici identificativi dei 5 borough
 df_zone = pd.read_csv('taxi+_zone_lookup.csv')
-df_zone['Borough'] = df_zone['Borough'].astype("string")
 # in input deve essere specificato l'anno del file
 periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
 periodo = datetime.strptime(periodo,'%Y-%m')
