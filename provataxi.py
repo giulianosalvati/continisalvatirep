@@ -18,6 +18,7 @@ import pandas as pd
 from datetime import datetime
 import sys
 from tqdm import tqdm
+from time import perf_counter
 
 """ 
 Sottoprogramma che legge il file CSV
@@ -56,8 +57,7 @@ def reduced_database_passeger_count(database_taxi):
     Tengo in considerazione solo le colonne:
         tpep_pickup_datetime 
         passenger_count 
-        PULocationID 
-    
+        PULocationID   
     """
     del database_taxi['VendorID']
     del database_taxi['DOLocationID']
@@ -105,7 +105,7 @@ def zero_passenger(database_taxi):
 
 def separate_borough(database_taxi,df_zone,borough_name):
     """
-    Sottoprogramma che dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
+    Sottoprogramma che, dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
     borough e il nome del borough,
     restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
     hanno come 'PULocationID' un codice che appartiene al borough in ingresso
@@ -117,17 +117,13 @@ def separate_borough(database_taxi,df_zone,borough_name):
     
     # loc_borough : Lista vuota che sarà riempita di tutti i codici che 
     # corrispondono al borough considerato
-    
     loc_borough = []
     
     # scorro le righe del dataframe delle zone in modo da riempire la lista 
     # loc_borough definita precedentemente
-    
     for i,zona in df_zone.iterrows():
-        # se il codice di una zona corrisponde al borough considerato
-        if zona[1] == borough_name:
-            # aggiungo il codice a loc_borough
-            loc_borough = loc_borough + [zona[0]]
+        if zona[1] == borough_name:  # se il codice corrisponde al borough...
+            loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
 
     borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]
     
@@ -141,21 +137,32 @@ Grafico dei dati
 """
 
 #### CODICE ####
+
 file_name = input('inserisci un file .csv: ')
+# Voglio calcolare il tempo di esecuzione del programmma:
+t_start = perf_counter() # tempo di inizio
+
 database_taxi = read_csv_file(file_name)
+
 #df_zone è un dataframe che contine i codici identificativi dei 5 borough
 df_zone = pd.read_csv('taxi+_zone_lookup.csv')
+
 # in input deve essere specificato l'anno del file
-periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
+periodo = input('Inserisci anno e mese del file (e.s. 2015-02):')
 periodo = datetime.strptime(periodo,'%Y-%m')
+
 database_taxi = reduced_database_passeger_count(database_taxi)
 database_taxi = check_month_database(database_taxi, periodo)
 database_taxi = zero_passenger(database_taxi)
 
+# Dataframe per ogni borough
 borough_Manhattan = separate_borough(database_taxi, df_zone,'Manhattan')
 borough_Queens = separate_borough(database_taxi, df_zone,'Queens')
 borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
 borough_Staten_Island = separate_borough(database_taxi, df_zone,'Staten Island')
 borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
 
+dt = perf_counter() - t_start # tempo di esecuzione
+
+print('Tempo di esecuzione: ' + str(dt) + 'ns')
 print('Fine')
