@@ -16,7 +16,40 @@ Obiettivo:
 import numpy  as np
 import pandas as pd 
 from datetime import datetime
+import sys
+from tqdm import tqdm
+from time import perf_counter
 
+""" 
+Sottoprogramma che legge il file CSV
+"""
+def fatal_error(message):
+    """
+    manage a fatal error: print a message and exit program
+    :param message: message to be printed
+    :return: None
+    """
+    print(message)
+    exit()
+
+
+def read_csv_file(file_name):
+    """
+    read a json file and returns data
+    manage exceptions
+    :param file_name: file to be read
+    :return: data structure corresponding to file content
+    """
+    try:
+        fin = open(file_name)
+        database_taxi = pd.read_csv(fin)
+        fin.close()
+        return database_taxi
+    except OSError as message:
+        fatal_error(message)
+""" 
+Sottoprogramma che salva il file 
+"""
 
 def reduced_database_passeger_count(database_taxi):
     """ 
@@ -24,8 +57,7 @@ def reduced_database_passeger_count(database_taxi):
     Tengo in considerazione solo le colonne:
         tpep_pickup_datetime 
         passenger_count 
-        PULocationID 
-    
+        PULocationID   
     """
     del database_taxi['VendorID']
     del database_taxi['DOLocationID']
@@ -70,26 +102,67 @@ def zero_passenger(database_taxi):
     database_taxi = database_taxi[database_taxi['passenger_count'] > 0]
     return database_taxi
             
+
+def separate_borough(database_taxi,df_zone,borough_name):
+    """
+    Sottoprogramma che, dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
+    borough e il nome del borough,
+    restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
+    hanno come 'PULocationID' un codice che appartiene al borough in ingresso
+    """
+   
+    # borough : DataFrame vuoto che sarà riempito degli eventuali dati che 
+    # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
+    borough = pd.DataFrame(columns=(database_taxi.columns))
+    
+    # loc_borough : Lista vuota che sarà riempita di tutti i codici che 
+    # corrispondono al borough considerato
+    loc_borough = []
+    
+    # scorro le righe del dataframe delle zone in modo da riempire la lista 
+    # loc_borough definita precedentemente
+    for i,zona in df_zone.iterrows():
+        if zona[1] == borough_name:  # se il codice corrisponde al borough...
+            loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
+
+    borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]
+    
+    return borough             
 """
-dividere il dataframe nei 5 borough:
-    - Manhattan
-    - Queens
-    - Brooklyn
-    - The Bronx
-    - Staten Island
-Cosi da lavorae seperatamente su ognuno come richiesto 
+Un sottoprogramma che ci da in uscita un nuovo dataframe che contiene fasce orarie
+(da 0 a 23 ogni ora) e numero totale di passeggeri
+"""
+"""
+Grafico dei dati
 """
 
 #### CODICE ####
 
-database_taxi = pd.read_csv('yellow_tripdata_2020-02.csv').head(80) 
+file_name = input('inserisci un file .csv: ')
+# Voglio calcolare il tempo di esecuzione del programmma:
+t_start = perf_counter() # tempo di inizio
+
+database_taxi = read_csv_file(file_name)
+
+#df_zone è un dataframe che contine i codici identificativi dei 5 borough
+df_zone = pd.read_csv('taxi+_zone_lookup.csv')
 
 # in input deve essere specificato l'anno del file
-periodo = input('inserisci anno e mese del file (e.s. 2015-02):')
+periodo = input('Inserisci anno e mese del file (e.s. 2015-02):')
 periodo = datetime.strptime(periodo,'%Y-%m')
 
 database_taxi = reduced_database_passeger_count(database_taxi)
 database_taxi = check_month_database(database_taxi, periodo)
 database_taxi = zero_passenger(database_taxi)
 
+# Dataframe per ogni borough
+borough_Manhattan = separate_borough(database_taxi, df_zone,'Manhattan')
+borough_Queens = separate_borough(database_taxi, df_zone,'Queens')
+borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
+borough_Staten_Island = separate_borough(database_taxi, df_zone,'Staten Island')
+borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
+
+dt = perf_counter() - t_start # tempo di esecuzione
+
+print('Tempo di esecuzione: ' + str(dt) + 'ns')
 print('Fine')
