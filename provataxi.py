@@ -13,7 +13,7 @@ Obiettivo:
     tipo di grafico:  
 """
 
-import numpy  as np
+from time_slots import time_slots
 import pandas as pd 
 from datetime import datetime
 import sys
@@ -162,7 +162,8 @@ borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
 borough_Staten_Island = separate_borough(database_taxi, df_zone,'Staten Island')
 borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
 
+time_slots = time_slots(database_taxi)
 dt = perf_counter() - t_start # tempo di esecuzione
 
-print('Tempo di esecuzione: ' + str(dt) + 'ns')
+print('Tempo di esecuzione: ' + str(dt) + ' ns')
 print('Fine')
