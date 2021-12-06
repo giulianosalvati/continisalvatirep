@@ -87,7 +87,10 @@ def check_month_database(database_taxi,periodo):
     database_taxi['year'] = database_taxi['tpep_pickup_datetime'].dt.year  
     database_taxi['month'] = database_taxi['tpep_pickup_datetime'].dt.month                             
     database_taxi = database_taxi[database_taxi['year'] == periodo.year] 
-    database_taxi = database_taxi[database_taxi['month'] == periodo.month]                       
+    database_taxi = database_taxi[database_taxi['month'] == periodo.month]
+    del database_taxi['year']
+    del database_taxi['month']
+                       
     return database_taxi
 
 def zero_passenger(database_taxi):
@@ -131,6 +134,9 @@ Grafico dei dati
 #### CODICE ####
 
 file_name = input('inserisci un file .csv: ')
+# in input deve essere specificato l'anno del file
+periodo = input('Inserisci anno e mese del file (e.s. 2015-02):')
+periodo = datetime.strptime(periodo,'%Y-%m')
 # Voglio calcolare il tempo di esecuzione del programmma:
 t_start = perf_counter() # tempo di inizio
 
@@ -138,10 +144,6 @@ database_taxi = read_csv_file(file_name)
 
 #df_zone è un dataframe che contine i codici identificativi dei 5 borough
 df_zone = pd.read_csv('taxi+_zone_lookup.csv')
-
-# in input deve essere specificato l'anno del file
-periodo = input('Inserisci anno e mese del file (e.s. 2015-02):')
-periodo = datetime.strptime(periodo,'%Y-%m')
 
 # Pulizia del dataframe:
 database_taxi = reduced_database_passeger_count(database_taxi)
@@ -156,8 +158,10 @@ borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
 borough_Staten_Island = separate_borough(database_taxi, df_zone,'Staten Island')
 borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
 
+# Divisione in fasce orarie 
 time_slots = time_slots(database_taxi)
+
 dt = perf_counter() - t_start # tempo di esecuzione
 
-print('Tempo di esecuzione: ' + str(dt) + ' ns')
+print('Tempo di esecuzione: ' + str(dt) + ' s')
 print('Fine')
