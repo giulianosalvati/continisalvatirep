@@ -83,17 +83,12 @@ def check_month_database(database_taxi,periodo):
     (quelli del file) elimina eventuali dati che non sono di tale periodo.
     ATTENZIONE! tengo conto della data in cui il passeggero è salito nel taxi
     """
-    # d = datetime.strptime(database_taxi['tpep_pickup_datetime'],'%Y-%m-%d %H:%M:%S')
-    # database_taxi['tpep_pickup_datetime'] = d
-    # temp_database = pd.DataFrame(columns=(database_taxi.columns))
-    # for data in database_taxi:
-    #     if data['tpep_pickup_datetime'].year != periodo.year || data['tpep_pickup_datetime'].month != periodo.month:
-    #         temp_database = temp_database
-    #         else:
-    #             temp_database =  temp_database.append(data)  
-    # database_taxi = temp_database                              
+    database_taxi['tpep_pickup_datetime'] = pd.to_datetime(database_taxi['tpep_pickup_datetime']).to_frame()
+    database_taxi['year'] = database_taxi['tpep_pickup_datetime'].dt.year  
+    database_taxi['month'] = database_taxi['tpep_pickup_datetime'].dt.month                             
+    database_taxi = database_taxi[database_taxi['year'] == periodo.year] 
+    database_taxi = database_taxi[database_taxi['month'] == periodo.month]                       
     return database_taxi
-   
 
 def zero_passenger(database_taxi):
     """
@@ -128,10 +123,7 @@ def separate_borough(database_taxi,df_zone,borough_name):
     borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]
     
     return borough             
-"""
-Un sottoprogramma che ci da in uscita un nuovo dataframe che contiene fasce orarie
-(da 0 a 23 ogni ora) e numero totale di passeggeri
-"""
+
 """
 Grafico dei dati
 """
@@ -151,11 +143,13 @@ df_zone = pd.read_csv('taxi+_zone_lookup.csv')
 periodo = input('Inserisci anno e mese del file (e.s. 2015-02):')
 periodo = datetime.strptime(periodo,'%Y-%m')
 
+# Pulizia del dataframe:
 database_taxi = reduced_database_passeger_count(database_taxi)
 database_taxi = check_month_database(database_taxi, periodo)
 database_taxi = zero_passenger(database_taxi)
 
 # Dataframe per ogni borough
+# boroughs = ['Manhattan','Queens','Bronx','Staten Island','Brooklyn']
 borough_Manhattan = separate_borough(database_taxi, df_zone,'Manhattan')
 borough_Queens = separate_borough(database_taxi, df_zone,'Queens')
 borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
