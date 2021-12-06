@@ -69,7 +69,7 @@ def getMonthFromParser(month):
 
 def readCsv(fileName):
     try:
-        df_in = pd.read_csv('taxi_file/'+fileName, usecols=['tpep_pickup_datetime','passenger_count']).head(90).sort_values(by=['tpep_pickup_datetime'])
+        df_in = pd.read_csv('taxi_file/'+fileName, usecols=['tpep_pickup_datetime','passenger_count','PULocationID']).head(10000).sort_values(by=['tpep_pickup_datetime'])
         return df_in
     except Exception as execption:
         # print('Data-source not found for given dates.')
