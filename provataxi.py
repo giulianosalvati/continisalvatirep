@@ -19,6 +19,7 @@ from datetime import datetime
 import sys
 from tqdm import tqdm
 from time import perf_counter
+from plot_passenger import plot_passenger
 
 """ 
 Sottoprogramma che legge il file CSV
@@ -160,6 +161,8 @@ borough_Brooklyn = separate_borough(database_taxi, df_zone,'Brooklyn')
 
 # Divisione in fasce orarie 
 time_slots = time_slots(database_taxi)
+
+plot_passenger(time_slots)
 
 dt = perf_counter() - t_start # tempo di esecuzione
 
