@@ -16,8 +16,6 @@ Obiettivo:
 from time_slots import time_slots
 import pandas as pd 
 from datetime import datetime
-import sys
-from tqdm import tqdm
 from time import perf_counter
 from plot_passenger import plot_passenger
 
@@ -82,7 +80,7 @@ def check_month_database(database_taxi,periodo):
     """
     sottoprogramma che in base all'anno e al mese che vengono inseriti in input
     (quelli del file) elimina eventuali dati che non sono di tale periodo.
-    ATTENZIONE! tengo conto della data in cui il passeggero è salito nel taxi
+    N.B. tengo conto della data in cui il passeggero sale nel taxi
     """
     database_taxi['tpep_pickup_datetime'] = pd.to_datetime(database_taxi['tpep_pickup_datetime']).to_frame()
     database_taxi['year'] = database_taxi['tpep_pickup_datetime'].dt.year  
@@ -109,7 +107,6 @@ def separate_borough(database_taxi,df_zone,borough_name):
     restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
     hanno come 'PULocationID' un codice che appartiene al borough in ingresso
     """
-   
     # borough : DataFrame vuoto che sarà riempito degli eventuali dati che 
     # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
     borough = pd.DataFrame(columns=(database_taxi.columns))
@@ -122,15 +119,10 @@ def separate_borough(database_taxi,df_zone,borough_name):
     # loc_borough definita precedentemente
     for i,zona in df_zone.iterrows():
         if zona[1] == borough_name:  # se il codice corrisponde al borough...
-            loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
-
+          loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
     borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]
-    
-    return borough             
 
-"""
-Grafico dei dati
-"""
+    return borough           
 
 #### CODICE ####
 
@@ -152,7 +144,7 @@ database_taxi = check_month_database(database_taxi, periodo)
 database_taxi = zero_passenger(database_taxi)
 
 # Dataframe per ogni borough
-# boroughs = ['Manhattan','Queens','Bronx','Staten Island','Brooklyn']
+#boroughs = ['Manhattan','Queens','Bronx','Staten Island','Brooklyn']
 borough_Manhattan = separate_borough(database_taxi, df_zone,'Manhattan')
 borough_Queens = separate_borough(database_taxi, df_zone,'Queens')
 borough_Bronx = separate_borough(database_taxi, df_zone,'Bronx')
