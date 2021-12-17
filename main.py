@@ -30,7 +30,7 @@ if __name__ == '__main__':
     
     cleaner = CleanData(data_taxi, year,month)
     data_taxi = cleaner.CleanDataframe() # elimino dal dataframe le colonne che non mi interessano
-    data_taxi = cleaner.zero_passenger() # elimino tutti i dati con zero passeggeri
+    data_taxi = cleaner.zero_passenger # elimino tutti i dati con zero passeggeri
     
     lista_df_borough=crea_lista_df_borough(data_taxi,args.borough) # Creo un lista di dataframe relativi ai dati di ciascun borough o del borough desiderato se richiesto
     fasce_orarie = timeSlots(data_taxi)

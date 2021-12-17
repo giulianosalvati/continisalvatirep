@@ -124,7 +124,7 @@ def separateBorough(database_taxi,borough_name):
     hanno come 'PULocationID' un codice che appartiene al borough in ingresso
     """
     
-    df_zone= pd.read_csv('indata/taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
+    df_zone= pd.read_csv('./indata/taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
     
     # borough : un df che sarà riempito da eventuali dati che 
     # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
