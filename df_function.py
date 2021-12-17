@@ -34,7 +34,7 @@ class CleanData:
                            
         return self.database_taxi
     
-    def zero_passenger(self,):
+    def zero_passenger(self):
         
         """
         sottoprogramma che elimina eventuali dati con 0 passeggeri
@@ -43,7 +43,7 @@ class CleanData:
         self.database_taxi = self.database_taxi[self.database_taxi['passenger_count'] > 0]
         return self.database_taxi
     
-# Utile.writeJsonFile(features_df)  
+# Utile.writeJsonFile(features_df)
     
 def timeSlots(database_taxi):
     """
@@ -59,6 +59,31 @@ def timeSlots(database_taxi):
     time_slots = database_taxi.groupby(by=['hour']).sum().groupby(level=0).cumsum()
         
     return time_slots
+def separateBorough(database_taxi,borough_name):
+    
+    """
+    Sottoprogramma che, dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
+    borough e il nome del borough,
+    restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
+    hanno come 'PULocationID' un codice che appartiene al borough in ingresso
+    """
+    df_zone= pd.read_csv('taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
+    
+    # borough : un df che sarà riempito da eventuali dati che 
+    # hanno come 'PULocationID' un codice che corrisponde al borough richiesto columns=(database_taxi.columns))
+    borough = pd.DataFrame(columns=(database_taxi.columns))
+    
+    # loc_borough : Lista che sarà riempita di tutti i codici che 
+    # corrispondono al borough considerato
+    loc_borough = []
+    
+    # scorro le righe del dataframe delle zone in modo da riempire la lista 
+    # loc_borough definita precedentemente
+    for i,zona in df_zone.iterrows():
+        if zona[1] == borough_name:  # se il codice corrisponde al borough...
+            loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
+    borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]   
+    return borough
     
 def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         
@@ -115,33 +140,6 @@ def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         #plt.savefig('./output/Grafico'+nome_borough+'.pdf')
         plt.show()
     
-def separateBorough(database_taxi,borough_name):
-    
-    """
-    Sottoprogramma che, dati in ingresso il dataframe dei taxi, il dataframe dei codici dei 
-    borough e il nome del borough,
-    restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
-    hanno come 'PULocationID' un codice che appartiene al borough in ingresso
-    """
-    
-    df_zone= pd.read_csv('./indata/taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
-    
-    # borough : un df che sarà riempito da eventuali dati che 
-    # hanno come 'PULocationID' un codice che corrisponde al borough richiesto
-    borough = pd.DataFrame(columns=(database_taxi.columns))
-    
-    # loc_borough : Lista che sarà riempita di tutti i codici che 
-    # corrispondono al borough considerato
-    loc_borough = []
-    
-    # scorro le righe del dataframe delle zone in modo da riempire la lista 
-    # loc_borough definita precedentemente
-    for i,zona in df_zone.iterrows():
-        if zona[1] == borough_name:  # se il codice corrisponde al borough...
-            loc_borough = loc_borough + [zona[0]]  # ..aggiungo il codice alla lista
-    borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]   
-    return borough
-  
 def crea_lista_df_borough(data_taxi,borough_name):
     
     """
