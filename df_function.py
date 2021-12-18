@@ -67,7 +67,7 @@ def separateBorough(database_taxi,borough_name):
     restituisce un dataframe che contiene tutti i dati del dataframe dei taxi che
     hanno come 'PULocationID' un codice che appartiene al borough in ingresso
     """
-    df_zone= pd.read_csv('taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
+    df_zone= pd.read_csv('indata/taxi+_zone_lookup.csv') # file che contiene i codici rispettivi ad ogni borough
     
     # borough : un df che sarà riempito da eventuali dati che 
     # hanno come 'PULocationID' un codice che corrisponde al borough richiesto columns=(database_taxi.columns))
