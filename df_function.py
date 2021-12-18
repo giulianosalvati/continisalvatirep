@@ -8,7 +8,6 @@ Created on Mon Dec 13 20:19:39 2021
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
-
 class CleanData:
     
     def __init__(self,database_taxi,year,month):
@@ -85,7 +84,7 @@ def separateBorough(database_taxi,borough_name):
     borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]   
     return borough
     
-def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
+def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         
     """
     Sottoprogramma che fa il plot dei dati del dataframe data_taxi e dei borough di interesse
@@ -97,8 +96,9 @@ def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
     borough=['Manhattan','Queens','Bronx','Staten Island','Brooklyn']
     labels = [*range(0,24,1)]
         
-        #trasformo la colonna passenger count di time slots in un array
+    #trasformo la colonna passenger count di time slots in un array
     array = fasce_orarie[["passenger_count"]].to_numpy()
+    save_file_risultati('New York', fasce_orarie, 'outdata/file_risultati')
         # da array passo a lista per inserirli come valori del grafico a barre
     values = array.flatten().tolist()        
         #plot 
@@ -108,7 +108,7 @@ def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
     plt.xticks(labels)
     plt.xlabel('Time slots')
     plt.ylabel('Passengers')
-    #plt.savefig('./output/GraficoYellowTaxi.pdf')
+    plt.savefig('./outdata/GraficoYellowTaxi.pdf')
     plt.show()
         
         ### Plot dei boroughs ###
@@ -116,19 +116,22 @@ def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
     if len(lista_df_borough)>1: # se ho df di piu boroughs
         for k in range(len(lista_df_borough)):
             fasce_orarie = timeSlots(lista_df_borough[k])
+            save_file_risultati(borough[k], fasce_orarie, 'outdata/file_risultati')
             array = fasce_orarie[["passenger_count"]].to_numpy()
             values = array.flatten().tolist()        
             plt.figure(figsize=(7,5))
             plt.title(borough[k])
-            plt.bar(labels,values,width=0.5,align='center',color=colori[k])        
+            plt.bar(labels,values,width=0.5 ,align='center',color=colori[k])        
             plt.xticks(labels)
             plt.xlabel('Time slots')
             plt.ylabel('Passengers')
-            #plt.savefig('./output/Grafico'+borough[k]+'.pdf')
+            plt.savefig('./outdata/Grafico'+borough[k].replace(" ", "")+'.pdf')
             plt.show()
                             
     else: # se mi interessa solo un borough
         fasce_orarie = timeSlots(lista_df_borough[0])
+        print(fasce_orarie)
+        save_file_risultati(nome_borough, fasce_orarie, 'outdata/file_risultati')
         array = fasce_orarie[["passenger_count"]].to_numpy()
         values = array.flatten().tolist()        
         plt.figure(figsize=(7,5))
@@ -137,7 +140,7 @@ def plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         plt.xticks(labels)
         plt.xlabel('Time slots')
         plt.ylabel('Passengers')
-        #plt.savefig('./output/Grafico'+nome_borough+'.pdf')
+        plt.savefig('./outdata/Grafico'+nome_borough.replace(" ", "")+'.pdf')
         plt.show()
     
 def crea_lista_df_borough(data_taxi,borough_name):
@@ -173,6 +176,13 @@ class CalcoloEstremi():
         minimo=self.fasce_orarie.loc[self.fasce_orarie['passenger_count'].idxmin()]
         return minimo
         
-    
+def save_file_risultati(nome_zona,fasce_orarie, nome_file_risultati):
+    f = open(nome_file_risultati,'+a')
+    f.write('\n')
+    massimo = CalcoloEstremi(fasce_orarie).calcola_il_max()
+    f.write(nome_zona +' : Orario con più passeggeri : '+ str(massimo.name) + ', con '+ str(int(massimo[0])) + ' passeggeri\n')
+    minimo = CalcoloEstremi(fasce_orarie).calcola_il_min()
+    f.write( nome_zona + ' : Orario con meno passeggeri : '+ str(minimo.name) + ', con '+ str(int(minimo[0])) + ' passeggeri\n')
+    f.close()
 
 

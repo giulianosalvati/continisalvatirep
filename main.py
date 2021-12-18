@@ -7,7 +7,7 @@ Created on Mon Dec 13 20:20:42 2021
 """
 
 import Utils
-from df_function import CleanData,plot_passenger,timeSlots,crea_lista_df_borough,CalcoloEstremi
+from df_function import CleanData,risult_plot_passenger,timeSlots,crea_lista_df_borough
 from time import perf_counter
 """
 Quali sono le fasce orarie con più passeggeri? E quella con meno? 
@@ -31,17 +31,9 @@ if __name__ == '__main__':
     cleaner = CleanData(data_taxi, year,month)
     data_taxi = cleaner.CleanDataframe() # elimino dal dataframe le colonne che non mi interessano
     data_taxi = cleaner.zero_passenger()# elimino tutti i dati con zero passeggeri
-    
     lista_df_borough=crea_lista_df_borough(data_taxi,args.borough) # Creo un lista di dataframe relativi ai dati di ciascun borough o del borough desiderato se richiesto
     fasce_orarie = timeSlots(data_taxi)
-    
-    estremi = CalcoloEstremi(fasce_orarie)
-    massimo= estremi.calcola_il_max()
-    print('Orario con piu passeggeri: '+ str(massimo.name) + ' con '+ str(int(massimo[0])) + ' passeggeri')
-    minimo= estremi.calcola_il_min()
-    print('Orario con meno passeggeri: '+ str(minimo.name) + ' con '+ str(int(minimo[0])) + ' passeggeri')
-    
-    plot_passenger(fasce_orarie,lista_df_borough,args.borough) # Plot del dataframe di New York e dei borough
+    risult_plot_passenger(fasce_orarie,lista_df_borough,args.borough) # Plot del dataframe di New York e dei borough
     
     dt = perf_counter() - t_start # tempo di esecuzione    
        
