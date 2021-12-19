@@ -8,6 +8,7 @@ Created on Mon Dec 13 20:19:39 2021
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
+import numpy as np
 class CleanData:
     
     def __init__(self,database_taxi,year,month):
@@ -51,13 +52,18 @@ def timeSlots(database_taxi):
     """
         
     #creo una colonna 'hour' che estrae l'ora dalla colonna 'tpep_pickup_datetime' del df
-    database_taxi['hour']= database_taxi['tpep_pickup_datetime'].dt.hour
+    database_taxi['hour'] = database_taxi['tpep_pickup_datetime'].dt.hour
     #elimino le colonne che non servono più (voglio una tabella con solo time slots e somma passeggeri)
     del database_taxi['PULocationID']
     #suddivido in base al valore presente nella colonna hour e per ciascuna sommo il numero di passeggeri
-    time_slots = database_taxi.groupby(by=['hour']).sum().groupby(level=0).cumsum()
-        
+    
+    time_slots = pd.DataFrame(index=[*range(0,24,1)],columns=['passenger_count'])
+    time_slots.index.names=['hour']
+    time_slots['passenger_count'] = database_taxi.groupby(by=['hour']).sum().groupby(level=0).cumsum()
+    time_slots['passenger_count'] = time_slots['passenger_count'].fillna(0) 
+    
     return time_slots
+
 def separateBorough(database_taxi,borough_name):
     
     """
@@ -130,7 +136,6 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
                             
     else: # se mi interessa solo un borough
         fasce_orarie = timeSlots(lista_df_borough[0])
-        print(fasce_orarie)
         save_file_risultati(nome_borough, fasce_orarie, 'outdata/file_risultati')
         array = fasce_orarie[["passenger_count"]].to_numpy()
         values = array.flatten().tolist()        
