@@ -67,6 +67,17 @@ def getMonthFromParser(month):
             exit()
     return month
 
+
+def getBoroughFromParser(borough):
+    boroughs=['Manhattan','Queens','Bronx','Staten Island','Brooklyn']
+    if borough != None:
+        if borough in boroughs:
+            return borough
+        else:               
+            print('Error! This borough does not exist')
+            exit()  
+            
+
 def readCsv(fileName):
     try:
         df_in = pd.read_csv('indata/'+fileName, usecols=['tpep_pickup_datetime','passenger_count','PULocationID']).sort_values(by=['tpep_pickup_datetime'])

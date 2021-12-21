@@ -22,6 +22,7 @@ if __name__ == '__main__':
     args = Utils.initializeParser()
     year = Utils.getYearFromParser(args.year)
     month = Utils.getMonthFromParser(args.month)
+    borough = Utils.getBoroughFromParser(args.borough)
     fileName = Utils.generateFileName(year, month)
     
     t_start = perf_counter() # tempo di inizio
