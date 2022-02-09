@@ -185,9 +185,9 @@ def save_file_risultati(nome_zona,fasce_orarie, nome_file_risultati):
     f = open(nome_file_risultati,'+a')
     f.write('\n')
     massimo = CalcoloEstremi(fasce_orarie).calcola_il_max()
-    f.write(nome_zona +' : Orario con più passeggeri : '+ str(massimo.name) + ', con '+ str(int(massimo[0])) + ' passeggeri\n')
+    f.write(nome_zona +' \n Orario con più passeggeri : '+ str(massimo.name) + ', con '+ str(int(massimo[0])) + ' passeggeri\n')
     minimo = CalcoloEstremi(fasce_orarie).calcola_il_min()
-    f.write( nome_zona + ' : Orario con meno passeggeri : '+ str(minimo.name) + ', con '+ str(int(minimo[0])) + ' passeggeri\n')
+    f.write( ' Orario con meno passeggeri : '+ str(minimo.name) + ', con '+ str(int(minimo[0])) + ' passeggeri\n')
     f.close()
 
 
