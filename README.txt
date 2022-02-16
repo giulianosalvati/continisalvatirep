@@ -13,7 +13,8 @@ Output: file, grafico
 
 Il codice considera come fascia oraria ogni ora.
 
-In uscita al programma c'è un file che indica la fascia oraria con il maggiore ed il minore numero di passeggeri per ogni area di interesse. In aggiunta a questo l'analisi viene completata con degli istogrammi che per New York e per ogni borough (se non viene specificato un borough in particolare tra gli input) mostra il numero dei passeggeri per ogni fascia oraria.
+Per ogni analisi svolta (anno, mese), il programma fornisce in uscita un file corrispondente che indica la fascia oraria con il maggiore ed il minore numero di passeggeri per ogni area di interesse. Se si svolge un'altra analisi su dei dati già precedentemente analizzati, questo file viene sovrascritto con i nuovi risultati; in caso contrario, viene creato un nuovo file.
+In aggiunta a questo file l'analisi viene completata con degli istogrammi, salvati in dei file in cui sono specificati il mese e l'anno corrispondenti, che mostrano il numero di passeggeri per ciascuna fascia oraria. Se si specifica in input un particolare borough, viene generato l'istogramma relativo a questo borough e quello relativo a tutta New York; altrimenti, vengono riportati i grafici di tutti i borough di New York.
 
 Per avviare l'analisi bisogna digitare in linea di comando:
 
