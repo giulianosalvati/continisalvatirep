@@ -34,7 +34,7 @@ if __name__ == '__main__':
     data_taxi = cleaner.zero_passenger()# elimino tutti i dati con zero passeggeri
     lista_df_borough=crea_lista_df_borough(data_taxi,args.borough) # Creo un lista di dataframe relativi ai dati di ciascun borough o del borough desiderato se richiesto
     fasce_orarie = timeSlots(data_taxi)
-    risult_plot_passenger(fasce_orarie,lista_df_borough,args.borough) # Plot del dataframe di New York e dei borough
+    risult_plot_passenger(fasce_orarie,lista_df_borough,args.borough,year,month) # Plot del dataframe di New York e dei borough
     
     dt = perf_counter() - t_start # tempo di esecuzione    
        

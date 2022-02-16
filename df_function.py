@@ -90,7 +90,7 @@ def separateBorough(database_taxi,borough_name):
     borough = database_taxi[database_taxi['PULocationID'].isin (loc_borough)]   
     return borough
     
-def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
+def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough, year, month):
         
     """
     Sottoprogramma che fa il plot dei dati del dataframe data_taxi e dei borough di interesse
@@ -104,7 +104,7 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         
     #trasformo la colonna passenger count di time slots in un array
     array = fasce_orarie[["passenger_count"]].to_numpy()
-    save_file_risultati('New York', fasce_orarie, 'outdata/file_risultati')
+    save_file_risultati('New York', fasce_orarie, 'outdata/file_risultati_'+ str(year).zfill(4) +'-'+ str(month).zfill(2), 'w')
         # da array passo a lista per inserirli come valori del grafico a barre
     values = array.flatten().tolist()        
         #plot 
@@ -114,7 +114,7 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
     plt.xticks(labels)
     plt.xlabel('Time slots')
     plt.ylabel('Passengers')
-    plt.savefig('./outdata/GraficoYellowTaxi.pdf')
+    plt.savefig('./outdata/GraficoYellowTaxi_'+ str(year).zfill(4) +'-'+ str(month).zfill(2)+'.pdf')
     plt.show()
         
         ### Plot dei boroughs ###
@@ -122,7 +122,7 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
     if len(lista_df_borough)>1: # se ho df di piu boroughs
         for k in range(len(lista_df_borough)):
             fasce_orarie = timeSlots(lista_df_borough[k])
-            save_file_risultati(borough[k], fasce_orarie, 'outdata/file_risultati')
+            save_file_risultati(borough[k], fasce_orarie, 'outdata/file_risultati_'+ str(year).zfill(4) +'-'+ str(month).zfill(2),'a')
             array = fasce_orarie[["passenger_count"]].to_numpy()
             values = array.flatten().tolist()        
             plt.figure(figsize=(7,5))
@@ -131,12 +131,12 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
             plt.xticks(labels)
             plt.xlabel('Time slots')
             plt.ylabel('Passengers')
-            plt.savefig('./outdata/Grafico'+borough[k].replace(" ", "")+'.pdf')
+            plt.savefig('./outdata/Grafico'+borough[k].replace(" ", "")+'_'+ str(year).zfill(4) +'-'+ str(month).zfill(2)+'.pdf')
             plt.show()
                             
     else: # se mi interessa solo un borough
         fasce_orarie = timeSlots(lista_df_borough[0])
-        save_file_risultati(nome_borough, fasce_orarie, 'outdata/file_risultati')
+        save_file_risultati(nome_borough, fasce_orarie, 'outdata/file_risultati_'+ str(year).zfill(4) +'-'+ str(month).zfill(2),'a')
         array = fasce_orarie[["passenger_count"]].to_numpy()
         values = array.flatten().tolist()        
         plt.figure(figsize=(7,5))
@@ -145,7 +145,7 @@ def risult_plot_passenger(fasce_orarie,lista_df_borough,nome_borough):
         plt.xticks(labels)
         plt.xlabel('Time slots')
         plt.ylabel('Passengers')
-        plt.savefig('./outdata/Grafico'+nome_borough.replace(" ", "")+'.pdf')
+        plt.savefig('./outdata/Grafico'+nome_borough.replace(" ", "")+'_'+ str(year).zfill(4) +'-'+ str(month).zfill(2)+'.pdf')
         plt.show()
     
 def crea_lista_df_borough(data_taxi,borough_name):
@@ -181,8 +181,8 @@ class CalcoloEstremi():
         minimo=self.fasce_orarie.loc[self.fasce_orarie['passenger_count'].idxmin()]
         return minimo
         
-def save_file_risultati(nome_zona,fasce_orarie, nome_file_risultati):
-    f = open(nome_file_risultati,'+a')
+def save_file_risultati(nome_zona,fasce_orarie, nome_file_risultati, m):
+    f = open(nome_file_risultati,f'+{m}') #m indica la modalità con cui vogliamo salvare il file (sovrascrivere: w, aggiungere: a)
     f.write('\n')
     massimo = CalcoloEstremi(fasce_orarie).calcola_il_max()
     f.write(nome_zona +' \n Orario con più passeggeri : '+ str(massimo.name) + ', con '+ str(int(massimo[0])) + ' passeggeri\n')
